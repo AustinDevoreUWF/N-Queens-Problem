@@ -1,22 +1,39 @@
 import random
-
-# 1. Get size of board
-# 2. state = 0->n for each placement
-# 3. Shuffle 0->n
-
+import math
+# Initial State
+    # 1. Get size of board
+    # 2. state = 0->n for each placement
+    # 3. Shuffle 0->n
 n = int(input("Provide n (size of the board): "))
-def initial_state(n):
+
+def create_state(n):
     state = list(range(n))
     random.shuffle(state)
     return state
-result = initial_state(n)
-print(result)
-    #n is num of columns, row numbers are random nums 0-n
+state = create_state(n)
 
-# Needs Initial State use a random generation
+print(state)
 
-#COST-Function(Objective Function) goal is attacking queens is Q=0(no queens attacking)so lower is best
+#Tempurature Figuring Algorithm
+    #
+
+
+
+
+
+
+#COST-Function(Objective Function) goal is attacking queens is Q=0(0queens attacking)so lower is best
 # So this is the main function for determination
+def cost_function(state):
+    n = len(state)
+    cost = 0
+    for i in range(n):
+        for j in range(i+1,n):
+            if(abs(state[i] - state[j]) == abs(i - j)):
+                cost += 1
+    return cost
+cost = cost_function(state)
+print(cost)
 
 #Needs the Creation of new States, take curr solution and checks near, but can also check outside
 
