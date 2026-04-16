@@ -35,6 +35,21 @@ def cost_function(state):
 cost = cost_function(state)
 print(cost)
 
+def neighbor(state):
+    new = state.copy()
+    i,j = random.sample(range(len(new)),2)
+    new[i],new[j]  = new[j],new[i]
+    return new
+
+def simulated_annealing(state):
+    current = state
+    T = 100
+    new = neighbor(current)
+
+    while T> .001:
+        delta = cost_function(new) - cost_function(current)
+
+
 #Needs the Creation of new States, take curr solution and checks near, but can also check outside
 
 #Acceptance of the new State alg P(e,e-new, T)
