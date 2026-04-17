@@ -36,14 +36,23 @@ def neighbor(state):
 def simulated_annealing(state):
     current = state
     T = 100
-
+    current_cost = cost_function(current)
     while T> .001:
+        if cost_function(current) == 0:
+            return current 
         new = neighbor(current)
-        delta = cost_function(new) - cost_function(current)
+        new_cost = cost_function(new)
+        delta = new_cost - current_cost
 
         if(delta<0):
             current = new
+            current_cost = new_cost
         else:#Set probability 
             P = math.exp(-delta / T)
-            random.random()
-#Needs the Creation of new States, take curr solution and checks near, but can also check outside
+            if random.random()<P:
+                current=new
+        T *= .99
+    return current
+solution = simulated_annealing(state)
+print(solution)
+print(cost_function(solution))
