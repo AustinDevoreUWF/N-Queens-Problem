@@ -13,15 +13,7 @@ def create_state(n):
 state = create_state(n)
 
 print(state)
-
 #Tempurature Figuring Algorithm
-    #
-
-
-
-
-
-
 #COST-Function(Objective Function) goal is attacking queens is Q=0(0queens attacking)so lower is best
 # So this is the main function for determination
 def cost_function(state):
@@ -44,18 +36,14 @@ def neighbor(state):
 def simulated_annealing(state):
     current = state
     T = 100
-    new = neighbor(current)
 
     while T> .001:
+        new = neighbor(current)
         delta = cost_function(new) - cost_function(current)
 
-
+        if(delta<0):
+            current = new
+        else:#Set probability 
+            P = math.exp(-delta / T)
+            random.random()
 #Needs the Creation of new States, take curr solution and checks near, but can also check outside
-
-#Acceptance of the new State alg P(e,e-new, T)
-# this requires, e= E(s)and the e-new= E(s-new)
-# High t is more randomness, low T is more greedy
-
-# T is determined by us as a var T= T * .90
-
-#Main Algorithm Loop
