@@ -3,82 +3,109 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 from core import simulated_annealing
 
-# ── experiment config ──────────────────────────────────────────────────────────
+# ── config ─────────────────────────────
 
-N_VALUES      = list(range(4, 31))
-COOLING_RATES = [0.999,0.90,.85,.80,.75,.65]
-T_START       = 100
-TRIALS        = 100
+N_VALUES = list(range(8, 30))
+COOLING_RATES = [0.999, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60]
 
-# ── run experiments ────────────────────────────────────────────────────────────
+T_START = 100
+TRIALS = 500
+TIME_LIMIT = 0.5
 
-results = defaultdict(dict)
-total = len(N_VALUES) * len(COOLING_RATES) * TRIALS
 
-print(f"Running {total} total trials...\n")
+# ── experiments ───────────────────────
 
-for n in N_VALUES:
-    budget = n ** 2 * 10        # tighten this number to stress test
-    for cooling in COOLING_RATES:
-        times, solved = [], []
-        for _ in range(TRIALS):
-            elapsed, success = simulated_annealing(n, cooling, T_START, max_steps=budget)
-            times.append(elapsed)
-            solved.append(success)
-        success_rate = sum(solved) / TRIALS
-        avg_time     = sum(times)  / TRIALS
-        results[n][cooling] = (success_rate, avg_time)
-        print(f"  N={n:2d}  budget={budget:7d}  cooling={cooling}  success={success_rate:.0%}  avg_time={avg_time:.3f}s")
+def run_experiments():
+    results = defaultdict(dict)
 
-# ── find optimal cooling rate per N ───────────────────────────────────────────
+    total = len(N_VALUES) * len(COOLING_RATES) * TRIALS
+    print(f"Running {total} trials...\n")
 
-print("\n── Optimal Cooling Rate per N (best success within fixed budget) ──")
-optimal_cooling = {}
-for n in N_VALUES:
-    best_rate = max(results[n][c][0] for c in COOLING_RATES)
-    best_c = min(c for c in COOLING_RATES if results[n][c][0] == best_rate)
-    optimal_cooling[n] = best_c
-    rate, avg = results[n][best_c]
-    print(f"  N={n:2d}  best cooling={best_c}  success={rate:.0%}  avg_time={avg:.3f}s")
+    for n in N_VALUES:
+        for cooling in COOLING_RATES:
 
-# ── plots ──────────────────────────────────────────────────────────────────────
+            times, successes, costs, steps_list = [], [], [], []
 
-success_grid = np.array([
-    [results[n][c][0] for c in COOLING_RATES]
-    for n in N_VALUES
-])
+            for _ in range(TRIALS):
+                steps, success, cost = simulated_annealing(
+                    n, cooling, T_START, max_steps=1000
+                )
 
-fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+                successes.append(success)
+                costs.append(cost)
+                steps_list.append(steps)
 
-# heatmap
-im = axes[0].imshow(success_grid, aspect="auto", cmap="RdYlGn", vmin=0, vmax=1)
-axes[0].set_xticks(range(len(COOLING_RATES)))
-axes[0].set_xticklabels(COOLING_RATES, rotation=45)
-axes[0].set_yticks(range(len(N_VALUES)))
-axes[0].set_yticklabels(N_VALUES)
-axes[0].set_xlabel("Cooling Rate")
-axes[0].set_ylabel("Board Size N")
-axes[0].set_title("Success Rate (fixed step budget)")
-plt.colorbar(im, ax=axes[0])
+            results[n][cooling] = {
+                "success": np.mean(successes),
+                "cost": np.mean(costs),
+                "steps": np.mean(steps_list),
+            }
 
-# optimal cooling rate per N
-axes[1].plot(N_VALUES, [optimal_cooling[n] for n in N_VALUES], marker="o", color="steelblue")
-axes[1].set_xlabel("Board Size N")
-axes[1].set_ylabel("Optimal Cooling Rate")
-axes[1].set_title("Fastest Cooling Rate That Still Wins")
-axes[1].grid(True)
+            print(
+                f"N={n:2d} c={cooling:<6} "
+                f"succ={np.mean(successes):.0%} "
+                f"steps={np.mean(steps_list):.0f} "
+                f"cost={np.mean(costs):.2f}"
+            )
 
-# success rate curves per cooling rate
-for c in COOLING_RATES:
-    rates = [results[n][c][0] for n in N_VALUES]
-    axes[2].plot(N_VALUES, rates, marker="o", label=f"c={c}")
-axes[2].set_xlabel("Board Size N")
-axes[2].set_ylabel("Success Rate")
-axes[2].set_title("Success Rate vs N per Cooling Rate")
-axes[2].legend(fontsize=7)
-axes[2].grid(True)
+    return results
 
-plt.tight_layout()
-plt.savefig("nqueens_cooling_analysis.png", dpi=150)
-plt.show()
-print("\nSaved to nqueens_cooling_analysis.png")
+
+# ── scoring ───────────────────────────
+
+def score(x):
+    return x["success"]
+
+def compute_optimal(results):
+    optimal = {}
+
+    print("\n── Optimal Cooling per N ──")
+
+    for n in N_VALUES:
+        best_c = max(COOLING_RATES, key=lambda c: score(results[n][c]))
+        optimal[n] = best_c
+
+        r = results[n][best_c]
+        print(
+            f"N={n:2d} best={best_c} "
+            f"succ={r['success']:.0%} steps={r['steps']:.0f}"
+        )
+
+    return optimal
+
+
+# ── plots ─────────────────────────────
+
+def plot_results(results, optimal):
+
+    success_grid = np.array([
+        [results[n][c]["success"] for c in COOLING_RATES]
+        for n in N_VALUES
+    ])
+
+    steps_grid = np.array([
+        [results[n][c]["steps"] for c in COOLING_RATES]
+        for n in N_VALUES
+    ])
+
+    fig, ax = plt.subplots(1, 3, figsize=(18, 6))
+
+    ax[0].imshow(success_grid, aspect="auto", vmin=0, vmax=1)
+    ax[0].set_title("Success Rate")
+
+    ax[1].plot(N_VALUES, [optimal[n] for n in N_VALUES], marker="o")
+    ax[1].set_title("Optimal Cooling")
+
+    ax[2].plot(N_VALUES, steps_grid.mean(axis=1), marker="o")
+    ax[2].set_title("Steps vs N")
+
+    plt.tight_layout()
+    plt.show()
+
+
+# ── main ──────────────────────────────
+
+if __name__ == "__main__":
+    results = run_experiments()
+    optimal = compute_optimal(results)
+    plot_results(results, optimal)

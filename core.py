@@ -2,10 +2,12 @@ import random
 import math
 import time
 
+
 def create_state(n):
     state = list(range(n))
     random.shuffle(state)
     return state
+
 
 def cost_function(state):
     n = len(state)
@@ -16,35 +18,35 @@ def cost_function(state):
                 cost += 1
     return cost
 
+
 def neighbor(state):
     new = state.copy()
     i, j = random.sample(range(len(new)), 2)
     new[i], new[j] = new[j], new[i]
     return new
 
-def simulated_annealing(n, cooling, T_start=100, max_steps=None):
+
+def simulated_annealing(n, cooling, T_start=100, max_steps=1000):
     current = create_state(n)
     current_cost = cost_function(current)
-    T = T_start
-    start = time.time()
-
-    if max_steps is None:
-        max_steps = n ** 2 * 10
 
     steps = 0
+
     while steps < max_steps:
+
         if current_cost == 0:
-            return time.time() - start, True
+            return steps, True, current_cost
 
         new = neighbor(current)
         new_cost = cost_function(new)
         delta = new_cost - current_cost
 
+        T = T_start * (cooling ** steps)
+
         if delta < 0 or (T > 0 and random.random() < math.exp(-delta / T)):
             current = new
             current_cost = new_cost
 
-        T *= cooling
         steps += 1
 
-    return time.time() - start, current_cost == 0
+    return steps, current_cost == 0, current_cost
