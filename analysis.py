@@ -1,111 +1,98 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import defaultdict
-from core import simulated_annealing
+
+from core import simulated_annealing, hill_climbing
+
 
 # ── config ─────────────────────────────
 
 N_VALUES = list(range(8, 30))
-COOLING_RATES = [0.999, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60]
+TRIALS = 100
 
+SA_COOLING = 0.85
 T_START = 100
-TRIALS = 500
-TIME_LIMIT = 0.5
 
 
-# ── experiments ───────────────────────
+# ── generic runner ─────────────────────
+
+def run_algorithm(algorithm, n, trials, **kwargs):
+    results = []
+
+    for _ in range(trials):
+        steps, success, cost = algorithm(n, **kwargs)
+        results.append((steps, success, cost))
+
+    steps = np.mean([r[0] for r in results])
+    success = np.mean([r[1] for r in results])
+    cost = np.mean([r[2] for r in results])
+
+    return {
+        "steps": steps,
+        "success": success,
+        "cost": cost
+    }
+
+
+# ── experiment ─────────────────────────
 
 def run_experiments():
     results = defaultdict(dict)
 
-    total = len(N_VALUES) * len(COOLING_RATES) * TRIALS
-    print(f"Running {total} trials...\n")
+    print("Running HC vs SA experiments...\n")
 
     for n in N_VALUES:
-        for cooling in COOLING_RATES:
 
-            times, successes, costs, steps_list = [], [], [], []
+        hc = run_algorithm(hill_climbing, n, TRIALS)
+        sa = run_algorithm(
+            simulated_annealing,
+            n,
+            TRIALS,
+            cooling=SA_COOLING,
+            T_start=T_START
+        )
 
-            for _ in range(TRIALS):
-                steps, success, cost = simulated_annealing(
-                    n, cooling, T_START, max_steps=1000
-                )
+        results[n]["HC"] = hc
+        results[n]["SA"] = sa
 
-                successes.append(success)
-                costs.append(cost)
-                steps_list.append(steps)
-
-            results[n][cooling] = {
-                "success": np.mean(successes),
-                "cost": np.mean(costs),
-                "steps": np.mean(steps_list),
-            }
-
-            print(
-                f"N={n:2d} c={cooling:<6} "
-                f"succ={np.mean(successes):.0%} "
-                f"steps={np.mean(steps_list):.0f} "
-                f"cost={np.mean(costs):.2f}"
-            )
+        print(
+            f"N={n} | "
+            f"HC succ={hc['success']:.0%} steps={hc['steps']:.1f} | "
+            f"SA succ={sa['success']:.0%} steps={sa['steps']:.1f}"
+        )
 
     return results
 
 
-# ── scoring ───────────────────────────
+# ── plots ──────────────────────────────
 
-def score(x):
-    return x["success"]
+def plot_results(results):
 
-def compute_optimal(results):
-    optimal = {}
+    N = list(results.keys())
 
-    print("\n── Optimal Cooling per N ──")
+    hc_success = [results[n]["HC"]["success"] for n in N]
+    sa_success = [results[n]["SA"]["success"] for n in N]
 
-    for n in N_VALUES:
-        best_c = max(COOLING_RATES, key=lambda c: score(results[n][c]))
-        optimal[n] = best_c
+    hc_steps = [results[n]["HC"]["steps"] for n in N]
+    sa_steps = [results[n]["SA"]["steps"] for n in N]
 
-        r = results[n][best_c]
-        print(
-            f"N={n:2d} best={best_c} "
-            f"succ={r['success']:.0%} steps={r['steps']:.0f}"
-        )
+    plt.figure()
+    plt.plot(N, hc_success, marker="o", label="Hill Climbing")
+    plt.plot(N, sa_success, marker="o", label="Simulated Annealing")
+    plt.title("Success Rate vs N")
+    plt.legend()
+    plt.show()
 
-    return optimal
-
-
-# ── plots ─────────────────────────────
-
-def plot_results(results, optimal):
-
-    success_grid = np.array([
-        [results[n][c]["success"] for c in COOLING_RATES]
-        for n in N_VALUES
-    ])
-
-    steps_grid = np.array([
-        [results[n][c]["steps"] for c in COOLING_RATES]
-        for n in N_VALUES
-    ])
-
-    fig, ax = plt.subplots(1, 3, figsize=(18, 6))
-
-    ax[0].imshow(success_grid, aspect="auto", vmin=0, vmax=1)
-    ax[0].set_title("Success Rate")
-
-    ax[1].plot(N_VALUES, [optimal[n] for n in N_VALUES], marker="o")
-    ax[1].set_title("Optimal Cooling")
-
-    ax[2].plot(N_VALUES, steps_grid.mean(axis=1), marker="o")
-    ax[2].set_title("Steps vs N")
-
-    plt.tight_layout()
+    plt.figure()
+    plt.plot(N, hc_steps, marker="o", label="Hill Climbing")
+    plt.plot(N, sa_steps, marker="o", label="Simulated Annealing")
+    plt.title("Steps vs N")
+    plt.legend()
     plt.show()
 
 
-# ── main ──────────────────────────────
+# ── main ───────────────────────────────
 
 if __name__ == "__main__":
     results = run_experiments()
-    optimal = compute_optimal(results)
-    plot_results(results, optimal)
+    plot_results(results)

@@ -5,7 +5,7 @@ import pygame
 from core import create_state, cost_function, neighbor
 
 
-def draw_board(screen, state, size):
+def draw_board(screen, state, size, queen_img, scale):
     n = len(state)
     cell = size // n
 
@@ -17,9 +17,9 @@ def draw_board(screen, state, size):
             pygame.draw.rect(screen, color, (col * cell, row * cell, cell, cell))
 
             if state[col] == row:
-                cx = col * cell + cell // 2
-                cy = row * cell + cell // 2
-                pygame.draw.circle(screen, (255, 0, 0), (cx, cy), cell // 3)
+                x = col * cell + (cell - scale) // 2
+                y = row * cell + (cell - scale) // 2
+                screen.blit(queen_img, (x, y))
 
     pygame.display.flip()
 
@@ -30,6 +30,13 @@ def run_visual(state):
     size = 600
     screen = pygame.display.set_mode((size, size))
     pygame.display.set_caption("Simulated Annealing N-Queens")
+
+    n = len(state)
+    cell = size // n
+
+    scale = int(cell * 0.8)
+    queen_img = pygame.image.load("queen.jpg").convert_alpha()
+    queen_img = pygame.transform.smoothscale(queen_img, (scale, scale))
 
     current = state
     current_cost = cost_function(current)
@@ -60,7 +67,7 @@ def run_visual(state):
         T *= 0.99
         steps += 1
 
-        draw_board(screen, current, size)
+        draw_board(screen, current, size, queen_img, scale)
         pygame.time.delay(1)
 
     print("Final cost:", current_cost)

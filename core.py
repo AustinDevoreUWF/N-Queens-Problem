@@ -1,7 +1,8 @@
 import random
 import math
-import time
 
+
+# ── shared utilities ─────────────────────
 
 def create_state(n):
     state = list(range(n))
@@ -26,6 +27,36 @@ def neighbor(state):
     return new
 
 
+# ── HILL CLIMBING ───────────────────────
+
+def hill_climbing(n, max_steps=1000):
+    current = create_state(n)
+    current_cost = cost_function(current)
+
+    steps = 0
+
+    while steps < max_steps:
+
+        if current_cost == 0:
+            return steps, True, current_cost
+
+        # generate best neighbor (steepest descent local search)
+        candidates = [neighbor(current) for _ in range(n)]
+        best = min(candidates, key=cost_function)
+        best_cost = cost_function(best)
+
+        if best_cost >= current_cost:
+            break
+
+        current = best
+        current_cost = best_cost
+        steps += 1
+
+    return steps, current_cost == 0, current_cost
+
+
+# ── SIMULATED ANNEALING ─────────────────
+
 def simulated_annealing(n, cooling, T_start=100, max_steps=1000):
     current = create_state(n)
     current_cost = cost_function(current)
@@ -39,11 +70,11 @@ def simulated_annealing(n, cooling, T_start=100, max_steps=1000):
 
         new = neighbor(current)
         new_cost = cost_function(new)
-        delta = new_cost - current_cost
 
+        delta = new_cost - current_cost
         T = T_start * (cooling ** steps)
 
-        if delta < 0 or (T > 0 and random.random() < math.exp(-delta / T)):
+        if delta < 0 or random.random() < math.exp(-delta / T):
             current = new
             current_cost = new_cost
 
