@@ -32,3 +32,5 @@ Cooling=0.94 | Success=49% | Steps=1215.7 | Cost=0.54
 Cooling=0.96 | Success=57% | Steps=1150.8 | Cost=0.45
 Cooling=0.98 | Success=78% | Steps=1024.5 | Cost=0.22
 Cooling=0.99 | Success=88% | Steps=1229.4 | Cost=0.12
+
+For Max_steps=1000

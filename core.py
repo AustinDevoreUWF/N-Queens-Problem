@@ -56,7 +56,7 @@ def hill_climbing(n, max_steps=1000):
 
 # ── SIMULATED ANNEALING ─────────────────
 
-def simulated_annealing(n, cooling, T_start=100, max_steps=2000):
+def simulated_annealing(n, cooling, T_start=100, max_steps=1000):
     current = create_state(n)
     current_cost = cost_function(current)
 
