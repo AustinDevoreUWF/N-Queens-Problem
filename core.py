@@ -40,7 +40,6 @@ def hill_climbing(n, max_steps=1000):
         if current_cost == 0:
             return steps, True, current_cost
 
-        # generate best neighbor (steepest descent local search)
         candidates = [neighbor(current) for _ in range(n)]
         best = min(candidates, key=cost_function)
         best_cost = cost_function(best)
@@ -57,7 +56,7 @@ def hill_climbing(n, max_steps=1000):
 
 # ── SIMULATED ANNEALING ─────────────────
 
-def simulated_annealing(n, cooling, T_start=100, max_steps=1000):
+def simulated_annealing(n, cooling, T_start=100, max_steps=2000):
     current = create_state(n)
     current_cost = cost_function(current)
 
@@ -74,7 +73,14 @@ def simulated_annealing(n, cooling, T_start=100, max_steps=1000):
         delta = new_cost - current_cost
         T = T_start * (cooling ** steps)
 
-        if delta < 0 or random.random() < math.exp(-delta / T):
+        if delta < 0:
+            accept = True
+        elif T > 1e-8:
+            accept = random.random() < math.exp(-delta / T)
+        else:
+            accept = False
+
+        if accept:
             current = new
             current_cost = new_cost
 

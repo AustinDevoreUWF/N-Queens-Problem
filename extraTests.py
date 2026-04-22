@@ -4,7 +4,7 @@ from core import simulated_annealing
 
 
 def cooling_rate_experiment():
-    cooling_rates = [0.70, 0.80, 0.85, 0.90, 0.95, 0.99]
+    cooling_rates = [.40,.42,.44,.46,.48,.50,.52,.54,.56,.58,.60,.62,.64,.66,.68,0.70,0.72,0.74,0.76,0.78,0.80,0.82,0.84,0.86,0.88,0.90,0.92,0.94,0.96,0.98,0.99]
     fixed_n = 20
 
     success_rates = []

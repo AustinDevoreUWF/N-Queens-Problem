@@ -8,7 +8,7 @@ from core import simulated_annealing, hill_climbing
 # ── config ─────────────────────────────
 
 N_VALUES = list(range(8, 30))
-TRIALS = 100
+TRIALS = 500
 
 SA_COOLING = 0.85
 T_START = 100

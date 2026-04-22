@@ -35,7 +35,7 @@ def run_visual(state):
     cell = size // n
 
     scale = int(cell * 0.8)
-    queen_img = pygame.image.load("queen.jpg").convert_alpha()
+    queen_img = pygame.image.load("queen.png").convert_alpha()
     queen_img = pygame.transform.smoothscale(queen_img, (scale, scale))
 
     current = state
