@@ -33,4 +33,37 @@ Cooling=0.96 | Success=57% | Steps=1150.8 | Cost=0.45
 Cooling=0.98 | Success=78% | Steps=1024.5 | Cost=0.22
 Cooling=0.99 | Success=88% | Steps=1229.4 | Cost=0.12
 
-For Max_steps=1000
+For Max_steps=1000  
+Cooling-rate experiment for N=20
+
+Cooling=0.40 | Success=21% | Steps=864.4 | Cost=1.05
+Cooling=0.42 | Success=25% | Steps=832.4 | Cost=1.00
+Cooling=0.44 | Success=23% | Steps=854.7 | Cost=1.02
+Cooling=0.46 | Success=26% | Steps=828.3 | Cost=0.96
+Cooling=0.48 | Success=23% | Steps=861.0 | Cost=1.01
+Cooling=0.50 | Success=26% | Steps=828.6 | Cost=0.97
+Cooling=0.52 | Success=25% | Steps=831.6 | Cost=1.00
+Cooling=0.54 | Success=23% | Steps=848.0 | Cost=1.04
+Cooling=0.56 | Success=27% | Steps=821.2 | Cost=0.97
+Cooling=0.58 | Success=28% | Steps=823.3 | Cost=0.92
+Cooling=0.60 | Success=25% | Steps=844.1 | Cost=0.99
+Cooling=0.62 | Success=24% | Steps=845.0 | Cost=1.00
+Cooling=0.64 | Success=24% | Steps=845.6 | Cost=0.97
+Cooling=0.66 | Success=26% | Steps=831.4 | Cost=0.96
+Cooling=0.68 | Success=27% | Steps=831.5 | Cost=0.99
+Cooling=0.70 | Success=27% | Steps=825.5 | Cost=0.96
+Cooling=0.72 | Success=23% | Steps=846.3 | Cost=1.02
+Cooling=0.74 | Success=25% | Steps=834.6 | Cost=0.97
+Cooling=0.76 | Success=27% | Steps=823.7 | Cost=0.94
+Cooling=0.78 | Success=28% | Steps=818.7 | Cost=0.92
+Cooling=0.80 | Success=28% | Steps=813.2 | Cost=0.89
+Cooling=0.82 | Success=25% | Steps=831.4 | Cost=0.95
+Cooling=0.84 | Success=29% | Steps=813.3 | Cost=0.90
+Cooling=0.86 | Success=28% | Steps=816.5 | Cost=0.90
+Cooling=0.88 | Success=32% | Steps=792.3 | Cost=0.82
+Cooling=0.90 | Success=32% | Steps=784.4 | Cost=0.79
+Cooling=0.92 | Success=38% | Steps=761.1 | Cost=0.71
+Cooling=0.94 | Success=45% | Steps=739.1 | Cost=0.59
+Cooling=0.96 | Success=57% | Steps=709.1 | Cost=0.45
+Cooling=0.98 | Success=65% | Steps=771.2 | Cost=0.36
+Cooling=0.99 | Success=42% | Steps=914.2 | Cost=0.63
